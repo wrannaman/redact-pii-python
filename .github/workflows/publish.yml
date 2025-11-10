@@ -7,6 +7,7 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    environment: pypi  # Optional: requires environment setup in GitHub repo settings
     permissions:
       id-token: write  # Required for OIDC
     steps:
