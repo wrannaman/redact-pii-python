@@ -193,10 +193,17 @@ class TestRedactor:
         assert request.get_full_url() == "https://api.redactpii.com/v1/events"
         assert request.get_method() == "POST"
 
-        # Check headers
-        assert "Authorization" in request.headers
-        assert request.headers["Authorization"] == "Bearer test-key"
-        assert request.headers["Content-Type"] == "application/json"
+        # Check headers (urllib.request.Request normalizes header names)
+        # Convert headers to dict for easier inspection
+        headers_dict = dict(request.headers)
+        # urllib normalizes headers - check for Authorization (case-insensitive)
+        auth_key = next((k for k in headers_dict.keys() if k.lower() == "authorization"), None)
+        assert auth_key is not None, f"Authorization header not found. Headers: {headers_dict}"
+        assert headers_dict[auth_key] == "Bearer test-key"
+        # Content-Type header (urllib stores as "Content-type")
+        content_type_key = next((k for k in headers_dict.keys() if k.lower() == "content-type"), None)
+        assert content_type_key is not None, f"Content-Type header not found. Headers: {headers_dict}"
+        assert headers_dict[content_type_key] == "application/json"
 
         # Check body
         body_data = request.data
